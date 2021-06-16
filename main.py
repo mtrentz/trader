@@ -31,8 +31,10 @@ if __name__ == '__main__':
     data = bt.feeds.GenericCSVData(
         dataname='dados/forex/EURUSD_HOURLY.csv',
 
-        fromdate=datetime.datetime(2010, 2, 14),
-        todate=datetime.datetime(2021, 2, 18),
+        fromdate=datetime.datetime(2021, 1, 1),
+        todate=datetime.datetime(2021, 6, 16),
+        timeframe=bt.TimeFrame.Minutes,
+        compression=60,
 
         nullvalue=0.0,
 
