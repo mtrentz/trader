@@ -8,7 +8,7 @@ import sys
 if __name__ == '__main__':
     cerebro = bt.Cerebro(optreturn=False)
     cerebro.addanalyzer(bt.analyzers.SharpeRatio, _name='sharpe_ratio')
-    cerebro.optstrategy(TwoMA, fastperiod=range(14,16), slowperiod=range(50,55))
+    cerebro.optstrategy(TwoMA, fastperiod=range(12,50, 2), slowperiod=range(100,250, 10))
     #cerebro.optstrategy(SMAcrossover, fast=range(5,55,5), slow=range(60,310,10))
     STARTING_CASH = 1000.0
     cerebro.broker.set_cash(STARTING_CASH)
@@ -54,11 +54,10 @@ if __name__ == '__main__':
             final_results_list.append([strategy.params.fastperiod, 
                 strategy.params.slowperiod, PnL, sharpe['sharperatio']])
 
-    # sort_by_sharpe = sorted(final_results_list, key=lambda x: x[3], 
-    #                          reverse=True)
-    # for line in sort_by_sharpe[:5]:
-    #     print(line)
-    print(final_results_list)
+    sort_by_sharpe = sorted(final_results_list, key=lambda x: x[2], 
+                             reverse=True)
+    for line in sort_by_sharpe[:]:
+        print(line)
 
 
 

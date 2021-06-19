@@ -1,16 +1,16 @@
 import backtrader as bt
 
 # Create a Stratey
-class TwoMA(bt.Strategy):
+class RSI(bt.Strategy):
     params = (
-        ('fastperiod', 5),
-        ('slowperiod', 10),
+        ('period', 14),
     )
 
     def log(self, txt, dt=None):
         ''' Logging function fot this strategy'''
         dt = dt or self.datas[0].datetime.date(0)
         #print('%s, %s' % (dt.isoformat(), txt))
+        print(txt)
 
     def __init__(self):
         # Keep a reference to the "close" line in the data[0] dataseries
@@ -21,12 +21,7 @@ class TwoMA(bt.Strategy):
         self.buyprice = None
         self.buycomm = None
 
-        self.slow_sma = bt.indicators.SMA(
-            self.dataclose, period=self.params.slowperiod)
-        self.fast_sma = bt.indicators.SMA(
-            self.dataclose, period=self.params.fastperiod)
-        self.crossover = bt.indicators.CrossOver(
-            self.fast_sma, self.slow_sma)
+        self.rsi = bt.indicators.RSI_EMA(period=self.p.period)
 
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
@@ -75,20 +70,9 @@ class TwoMA(bt.Strategy):
 
         # Check if we are in the market
         if not self.position:
-
-            if self.crossover > 0:
-                # BUY, BUY, BUY!!! (with all possible default parameters)
-                self.log('BUY CREATE, %.6f' % self.dataclose[0])
-                # Keep track of the created order to avoid a 2nd order
+            if self.rsi < 30:
                 self.order = self.buy()
 
-
-
         else:
-
-            if self.crossover < 0:
-                # SELL, SELL, SELL!!! (with all possible default parameters)
-                self.log('SELL CREATE, %.6f' % self.dataclose[0])
-                # Keep track of the created order to avoid a 2nd order
+            if self.rsi > 70:
                 self.order = self.sell()
-                #self.order = self.close()

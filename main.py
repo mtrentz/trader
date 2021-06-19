@@ -1,6 +1,8 @@
 import datetime
 import backtrader as bt
 from strategies.two_ma import TwoMA
+from strategies.rsi import RSI
+import pandas as pd
 import os
 import sys
 
@@ -9,52 +11,59 @@ if __name__ == '__main__':
     cerebro = bt.Cerebro()
 
     # Add a strategy
-    cerebro.addstrategy(TwoMA)
+    cerebro.addstrategy(RSI, period=14)
 
-    # Datas are in a subfolder of the samples. Need to find where the script is
-    # because it could have been called from anywhere
-    # modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
-    # datapath = os.path.join(modpath, 'dados/oracle.txt')
-
-    # # Create a Data Feed
-    # data = bt.feeds.YahooFinanceCSVData(
-    #     dataname=datapath,
-    #     # Do not pass values before this date
-    #     fromdate=datetime.datetime(1996, 1, 1),
-    #     # Do not pass values before this date
-    #     todate=datetime.datetime(2013, 12, 31),
-    #     # Do not pass values after this date
-    #     reverse=False)
+    # Create a Data Feed
+    modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
+    datapath = os.path.join(modpath, 'dados/oracle.txt')
+    data = bt.feeds.YahooFinanceCSVData(
+        dataname=datapath,
+        # Do not pass values before this date
+        fromdate=datetime.datetime(1996, 1, 1),
+        # Do not pass values before this date
+        todate=datetime.datetime(2013, 12, 31),
+        # Do not pass values after this date
+        reverse=False)
 
 
-    #Set data parameters and add to Cerebro
-    data = bt.feeds.GenericCSVData(
-        dataname='dados/forex/EURUSD_HOURLY.csv',
+    # # DADOS DO METATRADER
+    # data = bt.feeds.GenericCSVData(
+    #     dataname='dados/forex/EURUSD_HOURLY.csv',
 
-        fromdate=datetime.datetime(2021, 1, 1),
-        todate=datetime.datetime(2021, 6, 16),
-        timeframe=bt.TimeFrame.Minutes,
-        compression=60,
+    #     fromdate=datetime.datetime(2021, 1, 1),
+    #     todate=datetime.datetime(2021, 6, 16),
+    #     timeframe=bt.TimeFrame.Minutes,
+    #     compression=60,
 
-        nullvalue=0.0,
+    #     nullvalue=0.0,
 
-        dtformat=('%Y-%m-%d %H:%M:%S'),
-        #dtformat=('%Y-%m-%d'),
+    #     dtformat=('%Y-%m-%d %H:%M:%S'),
+    #     #dtformat=('%Y-%m-%d'),
 
-        datetime=0,
-        open=1,
-        high=2,
-        low=3,
-        close=4,
-        volume=-1,
-        openinterest=-1
-    )
+    #     datetime=0,
+    #     open=1,
+    #     high=2,
+    #     low=3,
+    #     close=4,
+    #     volume=-1,
+    #     openinterest=-1
+    # )
+
+    # # DADOS DE CRYPTO BINANCE DAILY
+    # df = pd.read_csv('dados\crypto\Binance_ETHUSDT_d.csv')
+    # df = df[['date', 'open', 'high', 'low', 'close', 'Volume ETH']]
+    # df.columns = ['datetime', 'open', 'high', 'low', 'close', 'volume']
+    # df['datetime'] = pd.to_datetime(df['datetime'])
+    # df = df.set_index('datetime')
+    # df = df.round(2)
+    # df = df[::-1]
+    # data = bt.feeds.PandasData(dataname=df)
 
     # Add the Data Feed to Cerebro
     cerebro.adddata(data)
 
     # Set our desired cash start
-    cerebro.broker.setcash(1000.0)
+    cerebro.broker.setcash(10000.0)
 
     # Add a FixedSize sizer according to the stake
     cerebro.addsizer(bt.sizers.FixedSize, stake=10)

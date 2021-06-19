@@ -4,6 +4,7 @@ from __future__ import (absolute_import, division, print_function,
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
+import pandas as pd
 
 # Import the backtrader platform
 import backtrader as bt
@@ -122,32 +123,41 @@ if __name__ == '__main__':
     #     # Do not pass values after this date
     #     reverse=False)
 
-        #Set data parameters and add to Cerebro
-    data = bt.feeds.GenericCSVData(
-        dataname='dados/forex/EURUSD_HOURLY.csv',
+    #    #Set data parameters and add to Cerebro
+    # data = bt.feeds.GenericCSVData(
+    #     dataname='dados/forex/EURUSD_HOURLY.csv',
 
-        fromdate=datetime.datetime(2010, 2, 14),
-        todate=datetime.datetime(2014, 2, 18),
+    #     fromdate=datetime.datetime(2010, 2, 14),
+    #     todate=datetime.datetime(2014, 2, 18),
 
-        nullvalue=0.0,
+    #     nullvalue=0.0,
 
-        dtformat=('%Y-%m-%d %H:%M:%S'),
-        #dtformat=('%Y-%m-%d'),
+    #     dtformat=('%Y-%m-%d %H:%M:%S'),
+    #     #dtformat=('%Y-%m-%d'),
 
-        datetime=0,
-        open=1,
-        high=2,
-        low=3,
-        close=4,
-        volume=-1,
-        openinterest=-1
-    )
+    #     datetime=0,
+    #     open=1,
+    #     high=2,
+    #     low=3,
+    #     close=4,
+    #     volume=-1,
+    #     openinterest=-1
+    # )
+
+    # DADOS DE CRYPTO BINANCE DAILY
+    df = pd.read_csv('dados\crypto\Binance_ETHUSDT_d.csv')
+    df = df[['date', 'open', 'high', 'low', 'close', 'Volume ETH']]
+    df.columns = ['datetime', 'open', 'high', 'low', 'close', 'volume']
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df = df.set_index('datetime')
+    df = df.round(2)
+    data = bt.feeds.PandasData(dataname=df)
 
     # Add the Data Feed to Cerebro
     cerebro.adddata(data)
 
     # Set our desired cash start
-    cerebro.broker.setcash(1000.0)
+    cerebro.broker.setcash(10000000.0)
 
     # Add a FixedSize sizer according to the stake
     cerebro.addsizer(bt.sizers.FixedSize, stake=10)

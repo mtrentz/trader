@@ -2,6 +2,7 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 import datetime
 import backtrader as bt
 import backtrader.feeds as btfeeds
+import pandas as pd
 
 # Create a Stratey
 class TestStrategy(bt.Strategy):
@@ -28,24 +29,34 @@ if __name__ == '__main__':
     # Add a strategy
     cerebro.addstrategy(TestStrategy)
 
-    data = btfeeds.GenericCSVData(
-        dataname='dados/forex/EURUSD_HOURLY.csv',
+#     data = btfeeds.GenericCSVData(
+#         dataname='dados/forex/EURUSD_HOURLY.csv',
 
-        fromdate=datetime.datetime(2021, 2, 14),
-        todate=datetime.datetime(2021, 2, 18),
+#         fromdate=datetime.datetime(2021, 2, 14),
+#         todate=datetime.datetime(2021, 2, 18),
 
-        nullvalue=0.0,
+#         nullvalue=0.0,
 
-        dtformat=('%Y-%m-%d %H:%M:%S'),
+#         dtformat=('%Y-%m-%d %H:%M:%S'),
 
-        datetime=0,
-        open=1,
-        high=2,
-        low=3,
-        close=4,
-        volume=5,
-        openinterest=-1
-)
+#         datetime=0,
+#         open=1,
+#         high=2,
+#         low=3,
+#         close=4,
+#         volume=5,
+#         openinterest=-1
+# )
+
+
+    df = pd.read_csv('dados\crypto\Binance_ETHUSDT_d.csv')
+    df = df[['date', 'open', 'high', 'low', 'close', 'Volume ETH']]
+    df.columns = ['datetime', 'open', 'high', 'low', 'close', 'volume']
+    df['datetime'] = pd.to_datetime(df['datetime'])
+    df = df.set_index('datetime')
+    df = df.round(2)
+    df = df[::-1]
+    data = bt.feeds.PandasData(dataname=df)
 
     # Add the Data Feed to Cerebro
     cerebro.adddata(data)
