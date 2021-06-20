@@ -3,6 +3,7 @@ import backtrader as bt
 from strategies.two_ma import TwoMA
 from strategies.rsi import RSI
 from strategies.bollinger_bands import BollingerBands
+from strategies.buy_and_hold import BuyAndHold
 import pandas as pd
 import os
 import sys
@@ -13,10 +14,11 @@ if __name__ == '__main__':
 
     # Add a strategy
     #cerebro.addstrategy(RSI, period=14)
+    cerebro.addstrategy(BuyAndHold)
     #cerebro.addstrategy(TwoMA)
-    cerebro.addstrategy(BollingerBands, BBandsperiod=115, Fator=3)
+    #cerebro.addstrategy(BollingerBands, BBandsperiod=115, Fator=3)
 
-    # Create a Data Feed
+    # # Create a Data Feed
     modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
     datapath = os.path.join(modpath, 'dados/oracle.txt')
     data = bt.feeds.YahooFinanceCSVData(
@@ -52,7 +54,7 @@ if __name__ == '__main__':
     #     openinterest=-1
     # )
 
-    # # DADOS DE CRYPTO BINANCE DAILY
+    # # # DADOS DE CRYPTO BINANCE DAILY
     # df = pd.read_csv('dados\crypto\Binance_ETHUSDT_d.csv')
     # df = df[['date', 'open', 'high', 'low', 'close', 'Volume ETH']]
     # df.columns = ['datetime', 'open', 'high', 'low', 'close', 'volume']
@@ -69,7 +71,7 @@ if __name__ == '__main__':
     cerebro.broker.setcash(10000.0)
 
     # Add a FixedSize sizer according to the stake
-    cerebro.addsizer(bt.sizers.FixedSize, stake=10)
+    #cerebro.addsizer(bt.sizers.FixedSize, stake=10)
 
     # Set the commission
     cerebro.broker.setcommission(commission=0.0)

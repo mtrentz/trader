@@ -1,10 +1,12 @@
 import backtrader as bt
+import math
 
 # Create a Stratey
 class TwoMA(bt.Strategy):
     params = (
         ('fastperiod', 5),
         ('slowperiod', 10),
+        ('order_pct', 0.95),
     )
 
     def log(self, txt, dt=None):
@@ -73,6 +75,9 @@ class TwoMA(bt.Strategy):
         if self.order:
             return
 
+        amount_to_invest = (self.p.order_pct * self.broker.cash)
+        self.size = math.floor(amount_to_invest / self.data.close)
+
         # Check if we are in the market
         if not self.position:
 
@@ -80,7 +85,7 @@ class TwoMA(bt.Strategy):
                 # BUY, BUY, BUY!!! (with all possible default parameters)
                 self.log('BUY CREATE, %.6f' % self.dataclose[0])
                 # Keep track of the created order to avoid a 2nd order
-                self.order = self.buy()
+                self.order = self.buy(size=self.size)
 
 
 
@@ -90,5 +95,4 @@ class TwoMA(bt.Strategy):
                 # SELL, SELL, SELL!!! (with all possible default parameters)
                 self.log('SELL CREATE, %.6f' % self.dataclose[0])
                 # Keep track of the created order to avoid a 2nd order
-                self.order = self.sell()
-                #self.order = self.close()
+                self.order = self.close()

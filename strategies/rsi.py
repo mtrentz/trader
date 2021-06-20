@@ -1,9 +1,11 @@
 import backtrader as bt
+import math
 
 # Create a Stratey
 class RSI(bt.Strategy):
     params = (
         ('period', 14),
+        ('order_pct', 0.95),
     )
 
     def log(self, txt, dt=None):
@@ -64,6 +66,9 @@ class RSI(bt.Strategy):
         # Simply log the closing price of the series from the reference
         self.log('Close, %.6f' % self.dataclose[0])
 
+        amount_to_invest = (self.p.order_pct * self.broker.cash)
+        self.size = math.floor(amount_to_invest / self.data.close)
+
         # Check if an order is pending ... if yes, we cannot send a 2nd one
         if self.order:
             return
@@ -71,8 +76,8 @@ class RSI(bt.Strategy):
         # Check if we are in the market
         if not self.position:
             if self.rsi < 30:
-                self.order = self.buy()
+                self.order = self.buy(size=self.size)
 
         else:
             if self.rsi > 70:
-                self.order = self.sell()
+                self.order = self.close()

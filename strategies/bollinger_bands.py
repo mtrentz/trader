@@ -1,10 +1,12 @@
 import backtrader as bt
+import math
 
 # Create a Stratey
 class BollingerBands(bt.Strategy):
     params = (
         ('BBandsperiod', 115),
-        ('Fator', 3)        
+        ('Fator', 3),
+        ('order_pct', 0.95),
     )
 
     def log(self, txt, dt=None):
@@ -72,36 +74,8 @@ class BollingerBands(bt.Strategy):
         if self.order:
             return
 
-        # FULL COPIADO
-        # CRIA LINHAS BLUE E RED
-        # if self.dataclose < self.bband.lines.bot and not self.position:
-        # 	self.redline = True
-
-        # if self.dataclose > self.bband.lines.top and self.position:
-        # 	self.blueline = True
-
-        # #AVALIA POSSIBILIDADE DE ENTRAR
-        # if self.dataclose > self.bband.lines.mid and not self.position and self.redline:
-        #     print("AAAAAAAAAAAAAAAAAAAAAAAA")     	
-        # 	# BUY, BUY, BUY!!! (with all possible default parameters)
-        #     self.log('BUY CREATE, %.2f' % self.dataclose[0])
-        #     # Keep track of the created order to avoid a 2nd order
-        #     self.order = self.buy()
-            
-
-        # if self.dataclose > self.bband.lines.top and not self.position:
-        #     # BUY, BUY, BUY!!! (with all possible default parameters)
-        #     self.log('BUY CREATE, %.2f' % self.dataclose[0])
-        #     # Keep track of the created order to avoid a 2nd order
-        #     self.order = self.buy()
-
-        # if self.dataclose < self.bband.lines.mid and self.position and self.blueline:
-        #     # SELL, SELL, SELL!!! (with all possible default parameters)
-        #     self.log('SELL CREATE, %.2f' % self.dataclose[0])
-        #     self.blueline = False
-        #     self.redline = False
-        #     # Keep track of the created order to avoid a 2nd order
-        #     self.order = self.sell()
+        amount_to_invest = (self.p.order_pct * self.broker.cash)
+        self.size = math.floor(amount_to_invest / self.data.close)
 
         #MINHA TENTATIVA
         #AVALIA POSSIBILIDADE DE ENTRAR
@@ -109,26 +83,27 @@ class BollingerBands(bt.Strategy):
         	# BUY, BUY, BUY!!! (with all possible default parameters)
             self.log('BUY CREATE, %.2f' % self.dataclose[0])
             # Keep track of the created order to avoid a 2nd order
-            self.order = self.sell()
+            self.order = self.sell(size=self.size)
             self.vendido = True
 
         if self.dataclose <= self.bband.lines.bot and not self.position:
             # BUY, BUY, BUY!!! (with all possible default parameters)
             self.log('BUY CREATE, %.2f' % self.dataclose[0])
             # Keep track of the created order to avoid a 2nd order
-            self.order = self.buy()
+            self.order = self.buy(size=self.size)
             self.comprado = True
 
         if self.dataclose <= self.bband.lines.mid and self.position and self.vendido:
             # SELL, SELL, SELL!!! (with all possible default parameters)
             self.log('SELL CREATE, %.2f' % self.dataclose[0])            
             # Keep track of the created order to avoid a 2nd order
-            self.order = self.buy()
+            #self.order = self.buy(size=self.size)
+            self.order = self.close()
             self.vendido = False
 
         if self.dataclose >= self.bband.lines.mid and self.position and self.comprado:
             # SELL, SELL, SELL!!! (with all possible default parameters)
             self.log('SELL CREATE, %.2f' % self.dataclose[0])            
             # Keep track of the created order to avoid a 2nd order
-            self.order = self.sell()
+            self.order = self.close()
             self.comprado = False
