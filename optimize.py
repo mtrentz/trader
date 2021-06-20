@@ -54,9 +54,9 @@ if __name__ == '__main__':
             final_results_list.append([strategy.params.fastperiod, 
                 strategy.params.slowperiod, PnL, sharpe['sharperatio']])
 
-    sort_by_sharpe = sorted(final_results_list, key=lambda x: x[2], 
+    sort_by_profit = sorted(final_results_list, key=lambda x: x[2], 
                              reverse=True)
-    for line in sort_by_sharpe[:]:
+    for line in sort_by_profit[:]:
         print(line)
 
 
