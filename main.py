@@ -2,6 +2,7 @@ import datetime
 import backtrader as bt
 from strategies.two_ma import TwoMA
 from strategies.rsi import RSI
+from strategies.bollinger_bands import BollingerBands
 import pandas as pd
 import os
 import sys
@@ -11,7 +12,9 @@ if __name__ == '__main__':
     cerebro = bt.Cerebro()
 
     # Add a strategy
-    cerebro.addstrategy(RSI, period=14)
+    #cerebro.addstrategy(RSI, period=14)
+    #cerebro.addstrategy(TwoMA)
+    cerebro.addstrategy(BollingerBands, BBandsperiod=115, Fator=3)
 
     # Create a Data Feed
     modpath = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -19,7 +22,7 @@ if __name__ == '__main__':
     data = bt.feeds.YahooFinanceCSVData(
         dataname=datapath,
         # Do not pass values before this date
-        fromdate=datetime.datetime(1996, 1, 1),
+        fromdate=datetime.datetime(2010, 1, 1),
         # Do not pass values before this date
         todate=datetime.datetime(2013, 12, 31),
         # Do not pass values after this date
